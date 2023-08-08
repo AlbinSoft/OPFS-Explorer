@@ -17,7 +17,7 @@ Many many things
 
 ## Screenshots
 
-![Sample](https://github.com/AlbinSoft/OPFS-Explorer/blob/master/screenshot-01.png?raw=true)
+![Sample](https://github.com/AlbinSoft/OPFS-Explorer/blob/8d2d91b131e2eb236db64f80c150bab7cebd52f0/screenshot-01.png?raw=true)
 
 ## Why preact?
 
