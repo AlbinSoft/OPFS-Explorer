@@ -1,0 +1,111 @@
+import { signal, effect } from "@preact/signals";
+import { html } from "htm/preact";
+import { useEffect, useState } from 'preact/hooks';
+
+import { upath } from './opfs-global.js';
+import Storage from './opfs-storage.js';
+
+export default function (props) {
+
+	const [ files, setFiles ] = useState([]);
+
+	const [ storing, setStoring ] = useState(false);
+	const [ muststop, setMustStop ] = useState(false);
+
+	useEffect(() => {
+		if(!storing && files.length) store_files();
+	}, [files]);
+
+	const choose_files = async (evt) => {
+		evt.preventDefault();
+console.log('choose_files');
+		const fileHandles = await window.showOpenFilePicker({ multiple: true });
+console.log('Files in queue', files);
+console.log(fileHandles);
+		if(fileHandles.length) {
+			const tmp = [...files];
+			fileHandles.map(fileHandle => {
+				const info = new FileInfo({
+					name: fileHandle.name,
+					hfile: fileHandle,
+					status: 'waiting',
+				});
+console.log('FileInfo', info);
+				tmp.push(info);
+			});
+console.log('Files to queue', tmp);
+			setFiles(tmp);
+		}
+	};
+
+	const store_files = async () => {
+		console.log('store_files');
+		setStoring(true);
+		for(let file of gimme_files()) {
+			await file.store();
+			if(muststop) break;
+		}
+		setStoring(false);
+	};
+
+	const gimme_files = function *() {
+		let itr = 0;
+		if(files[itr]) {
+			files[itr].info.ui = fileinfo.bind(null, files[itr]);
+			yield files[itr++];
+		}
+	};
+
+	const str_path = '/'+upath.value.join('/');
+
+	return html`<dialog id="create" open>
+		<form >
+			<span onClick=${props.close}>&times;</span>
+			<button onClick=${choose_files}>Choose files</button>
+		</form>
+		${ storing ? 'Storing' : 'Idle '}
+		${ muststop ? 'Aborting' : ' '}
+		${ files.map(file => {
+			console.log('Files.map', file);
+		//	return file.ui;
+		} ) }
+	</dialog>`;
+}
+
+function fileinfo(finfo, props) {
+	const [ info, setInfo ] = useState(info);
+
+	useEffect(async () => {
+		const fblob = await info.hfile.getFile();
+		setInfo({ ...info, status: 'writing' });
+		Storage.store_file(info.name, fblob).then(() => {
+			setInfo({ ...info, status: 'written' });
+		});
+	}, []);
+
+	return html`<p>
+		${file.name} ... ${file.status}
+	</p>`;
+}
+
+
+class FileInfo {
+
+	constructor(info) {
+		this.info = signal(info);
+	}
+
+	async store() {
+		this.info.value = { ...this.info.value, status: 'writing' };
+		const fblob = await this.info.value.hfile.getFile();
+		Storage.store_file(this.info.value.name, fblob).then(() => {
+			this.info.value = { ...this.info.value, status: 'written' };
+		});
+	}
+
+	ui(props) {
+		return html`<p>
+			${this.info.value.name} ... ${this.info.value.status}
+		</p>`;		
+	}
+}
