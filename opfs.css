@@ -48,7 +48,7 @@ nav .ico {
 	display: block;
 	width: 48px;
 	height: 48px;
-	margin: 0px auto 4px auto;
+	margin: 0px auto 0px auto;
 	background-image: var(--sprites);
 }
 @media (max-width: 767px) {
@@ -86,6 +86,8 @@ main {
 }
 
 h1 {
+	display: flex;
+	align-items: center;
 	margin: 16px 0px 16px 0px;
 	padding: 0px 0px 16px 0px;
 	font-size  : 20px;
@@ -93,12 +95,22 @@ h1 {
 	border-bottom: 1px solid #E7E7E7;
 }
 h1 .ico_home {
-	display: inline-block;
-	vertical-align: middle;
 	width : 24px;
 	height: 24px;
-	margin: 0px 20px 0px 0px;
+	margin: 0px 10px 0px 0px;
 	background: var(--sprites) -80px -16px;
+}
+h2 {
+	position: relative;
+	margin : -20px -20px 10px -20px;
+	padding: 10px 10px 10px 10px;
+	font-size  : 14px;
+	font-weight: 400;
+	line-height: 24px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	background: #F4F4F4;
+	z-index: 1;
 }
 
 
@@ -200,7 +212,8 @@ h1 .ico_home {
 
 
 
-#create {
+#create,
+#search {
 	position: fixed;
 	top   : 100px;
 	left  : 50%;
@@ -210,12 +223,20 @@ h1 .ico_home {
 	box-sizing: border-box;
 	border: 1px solid #E7E7E7;
 	overflow: overlay;
+	outline: unset;
 }
-#create::backdrop {
+#create::backdrop,
+#search::backdrop {
 	background: transparent;
 	/* background-color: #a6c4e8d1; */
 	/* filter: blur(10px); */
 	backdrop-filter: blur(10px);
+}
+#search {
+	padding: 0px 0px 0px 0px;
+}
+.search_form {
+	padding: 20px 20px 20px 20px;
 }
 
 .btn_close {
@@ -224,11 +245,16 @@ h1 .ico_home {
 	right : 10px;
 	width : 24px;
 	height: 24px;
-	background: var(--sprites) -80px -80px;
+	background: var(--sprites) -114px -80px;
 	cursor: pointer;
+	z-index: 2;
 }
 
-.btn_choose {
+
+
+.btn_choose,
+.btn_search,
+.btn_create {
 	display: block;
 	margin: 0px auto;
 	padding: 5px 20px;
@@ -243,9 +269,26 @@ h1 .ico_home {
 	border: unset;
 	cursor: pointer;
 }
-.btn_choose:hover {
+.btn_choose:hover,
+.btn_search:hover,
+.btn_create:hover {
 	background: #333333;
 }
+
+
+
+.search_query,
+.directory_name {
+	display: block;
+	width : 100%;
+	margin : 20px 0px 20px 0px;
+	padding: 10px;
+	box-sizing: border-box;
+	border: 1px solid #D7D7D7;
+	border-radius: 10px;
+}
+
+
 
 .files_upload {
 	margin : 0px;
@@ -289,4 +332,11 @@ h1 .ico_home {
 }
 .files_uploading .ico_waiting {
 	background-position: -80px -176px;
+}
+
+.empty {
+	margin : 0px;
+	padding: 8px 0px;
+	color : #A7A7A7;
+	font-style: italic;
 }

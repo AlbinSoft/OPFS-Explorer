@@ -1,6 +1,7 @@
 
 import { html } from "htm/preact";
 
+import { filesize } from './opfs-global.js';
 import { tree, treeRed } from './opfs-global.js';
 import { upath, upathRed } from './opfs-global.js';
 
@@ -30,34 +31,22 @@ function Tree(props) {
 		treeRed.remEntry(entry.id);
 	};
 
-	const size = (s) => {
-		if(s<Math.pow(2, 10)) {
-			return html`<span class="cell size size_b" >${Math.round(s/Math.pow(2,  0), 0)}</span>`;
-		}
-		if(s<Math.pow(2, 20)) {
-			return html`<span class="cell size size_kb">${Math.round(s/Math.pow(2, 10), 0)}</span>`;
-		}
-		if(s<Math.pow(2, 30)) {
-			return html`<span class="cell size size_mb">${Math.round(s/Math.pow(2, 20), 0)}</span>`;
-		}
-		if(s<Math.pow(2, 40)) {
-			return html`<span class="cell size size_gb">${Math.round(s/Math.pow(2, 30), 0)}</span>`;
-		}
-		return 'Really big';
-	}
+	const go_home = () => {
+		upath.value = [];
+	};
 
 //	[ ${ top_path.join('/') } | ${ sub_path.join('/') } ]
 	return html`
-		${ props.is_top ? html`<h1><span class="ico ico_home"></span>${str_path}</h1>` : ''}
+		${ props.is_top ? html`<h1><span class="ico ico_home" onClick=${go_home}></span>${str_path}</h1>` : ''}
 		${ entries.length ? html`
 			<div class="entries">
-				${ props.is_top && sub_path.length===0 ? html`
+				${ props.is_top && upath.value.length!==0 ? html`
 					<div class="row dir">
 						<span class="ico ico_dir"></span>
 						<span class="cell name" onClick=${() => open_directory('..')}>..</span>
 						<span class="cell size"></span>
 						<span class="cell dt"  ></span>
-						<span class="cell act"></span>
+						<span class="cell act" ></span>
 					</div>
 				` : ''}
 				${entries.map(entry => {
@@ -76,7 +65,7 @@ function Tree(props) {
 						return html`<div class="row file">
 							<span class="ico ico_fle"></span>
 							<span class="cell name">${entry.name}</span>
-							${size(entry.size)}
+							${filesize(entry.size)}
 							<span class="cell dt"  >${entry.dts}</span>
 							<span class="cell act" ><span onClick=${remEntry.bind(null, entry)}>rem</span></span>
 						</div>`;
@@ -85,7 +74,7 @@ function Tree(props) {
 			</div>
 		` : html`
 			<div class="entries">
-				${ props.is_top && sub_path.length===0 ? html`
+				${ props.is_top && upath.value.length!==0 ? html`
 					<div class="row dir">
 						<span onClick=${() => open_directory('..')}>..</span>
 						<span></span>
@@ -93,7 +82,7 @@ function Tree(props) {
 						<span class="cell act"></span>
 					</div>
 				` : ''}
-				<p>Listado vacio</p>
+				<p class="empty">Empty folder</p>
 			</div>
 		` }
 	`;

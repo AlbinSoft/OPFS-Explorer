@@ -1,3 +1,4 @@
+import { createRef } from 'preact';
 import { signal, effect } from "@preact/signals";
 import { html } from "htm/preact";
 import { useEffect, useState } from 'preact/hooks';
@@ -7,11 +8,27 @@ import Storage from './opfs-storage.js';
 
 export default function (props) {
 
+	const dialog = createRef();
+
 	const [ files, setFiles ] = useState([]);
 	const [ undone, setUndone ] = useState(0);
 
 	const [ storing, setStoring ] = useState(false);
 	const [ muststop, setMustStop ] = useState(false);
+
+	useEffect(() => {
+		const x = (e) => {
+			if(e.target==dialog.current) props.close();
+		};
+		window.addEventListener('click', x);
+		return () => {
+			window.removeEventListener('click', x);
+		};
+	}, [dialog.current]);
+
+	useEffect(() => {
+		dialog.current && dialog.current.showModal();
+	}, [dialog.current]);
 
 	useEffect(() => {
 		if(!storing && undone>0) store_files();
@@ -74,9 +91,11 @@ console.log('store_file', itr);
 
 	const str_path = '/'+upath.value.join('/');
 
-	return html`<dialog id="create" open>
+	return html`<dialog id="create" ref=${dialog}>
 		<form class="files_upload">
 			<span class="btn_close" onClick=${props.close}></span>
+			<h2>Upload files</h2>
+			<span>${str_path}</span>
 			<button class="btn_choose" onClick=${choose_files}>Choose files</button>
 		</form>
 		<p class="files_status">${ muststop ? 'Aborting' : storing ? 'Storing '+undone : 'Idle '}</p>

@@ -1,10 +1,14 @@
 
+import { html } from "htm/preact";
+
 import { signal, effect } from "@preact/signals";
+
+const stored_query = localStorage.getItem('search_query') ?? '';
 
 const tree = signal([]);
 const upath = signal([]);
 
-const search_query = signal('');
+const search_query = signal(stored_query);
 const results_tress = signal({});
 
 const list = signal([]);
@@ -29,10 +33,14 @@ effect(() => {
 		};
 		search(query, entries, []);
 		list.value = found;
-	} else {	
+	} else {
 		list.value = [];
 	}
 }, [search_query.value, tree.value]);
+
+effect(() => {
+	localStorage.setItem('search_query', search_query.value);
+}, [search_query.value]);
 
 const listRed = {
 
@@ -119,9 +127,26 @@ const upathRed = {
 	}
 };
 
+const filesize = (s) => {
+	if(s<Math.pow(2, 10)) {
+		return html`<span class="cell size size_b" >${Math.round(s/Math.pow(2,  0), 0)}</span>`;
+	}
+	if(s<Math.pow(2, 20)) {
+		return html`<span class="cell size size_kb">${Math.round(s/Math.pow(2, 10), 0)}</span>`;
+	}
+	if(s<Math.pow(2, 30)) {
+		return html`<span class="cell size size_mb">${Math.round(s/Math.pow(2, 20), 0)}</span>`;
+	}
+	if(s<Math.pow(2, 40)) {
+		return html`<span class="cell size size_gb">${Math.round(s/Math.pow(2, 30), 0)}</span>`;
+	}
+	return 'Really big';
+};
+
 export {
 	tree, treeRed,
 	list, listRed,
 	upath, upathRed,
-	search_query
+	search_query,
+	filesize
 };
